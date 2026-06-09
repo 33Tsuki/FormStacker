@@ -1,0 +1,286 @@
+{
+  "fillForm": "Fill Form",
+  "administration": "Administration",
+  "welcomeBack": "Welcome back",
+  "welcomeBackWaving": "Welcome back 👋",
+  "language": "Language",
+  "submit": "Submit",
+  "name": "Full Name",
+  "dateOfBirth": "Date of Birth",
+  "gender": "Gender",
+  "noResponsesYet": "No responses yet",
+  "adminPassword": "Admin Password",
+  "password": "Password",
+  "uploaded": "Uploaded",
+  "unlock": "Unlock",
+  "cancel": "Cancel",
+  
+  "home": "Home",
+  "settings": "Settings",
+  "formStacker": "FormStacker",
+  "navigationAndSettings": "Navigation & Settings",
+  "fillAndManage": "Fill out and manage form responses",
+  "createAndSubmit": "Create and submit a new form",
+  "manageFormsAndUsers": "Manage forms, users and settings",
+  "overview": "Overview",
+  "viewAll": "View all",
+  "totalResponses": "Total Responses",
+  "questionsAnswered": "Questions Answered",
+  "pendingResponses": "Pending Responses",
+  "keepTrackBanner": "Keep track of your forms and responses all in one place.",
+  
+  "personalDetails": "Personal Details",
+  "enterName": "Please enter your name",
+  "email": "Email",
+  "enterEmail": "Please enter a valid email address",
+  "selectDob": "Please select your date of birth",
+  "calculatedAge": "Calculated Age: {age}",
+  "@calculatedAge": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "yearsOfExperience": "Years of Experience",
+  "selfRating": "Self-Rating",
+  "profileDetails": "Profile Details",
+  "profilePhoto": "Profile Photo",
+  "gallery": "Gallery",
+  "takePhoto": "Take Photo",
+  "resumePdf": "Resume (PDF)",
+  "uploadResume": "Upload Resume",
+  "fileSizeError": "File size must be under 5MB",
+  "languagesKnown": "Languages Known",
+  "physicalAttributes": "Physical Attributes",
+  "height": "Height",
+  "feet": "Feet",
+  "inches": "Inches",
+  "weightKg": "Weight (kg)",
+  "termsAndConditions": "Terms and Conditions",
+  "agreeTerms": "I agree to the terms and conditions",
+  "acceptTermsError": "You must accept terms to continue",
+  "responseSubmitted": "Response submitted!",
+  
+  "cameraPermissionRequired": "Camera permission is required to capture photos using your camera.",
+  "photosPermissionRequired": "Photos permission is required to select images from your gallery.",
+  "storagePermissionRequired": "Storage permission is required to select images from your gallery.",
+  "resumePermissionRequired": "Storage permission is required to select and upload your resume.",
+  "permissionRequired": "Permission Required",
+  "openSettings": "Open Settings",
+  
+  "unlockAdmin": "Unlock Administration",
+  "enterPasswordToAccess": "Enter password to access form responses",
+  "pleaseEnterPassword": "Please enter the admin password",
+  "searchResponses": "Search responses...",
+  "ageAndExperience": "Age: {age} | Experience: {exp} years",
+  "@ageAndExperience": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      },
+      "exp": {
+        "type": "int"
+      }
+    }
+  },
+  "languagesLabel": "Languages: {langs}",
+  "@languagesLabel": {
+    "placeholders": {
+      "langs": {
+        "type": "String"
+      }
+    }
+  },
+  "noPhotoUploaded": "No photo uploaded",
+  "viewPhoto": "View Photo",
+  "noResumeUploaded": "No resume uploaded",
+  "viewResume": "View Resume",
+  "viewDetails": "View Details",
+  "nameLabel": "Name: {name}",
+  "@nameLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "emailLabel": "Email: {email}",
+  "@emailLabel": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "dobLabel": "Date of Birth: {dob}",
+  "@dobLabel": {
+    "placeholders": {
+      "dob": {
+        "type": "String"
+      }
+    }
+  },
+  "ageLabel": "Age: {age}",
+  "@ageLabel": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "genderLabel": "Gender: {gender}",
+  "@genderLabel": {
+    "placeholders": {
+      "gender": {
+        "type": "String"
+      }
+    }
+  },
+  "experienceLabel": "Experience: {exp} years",
+  "@experienceLabel": {
+    "placeholders": {
+      "exp": {
+        "type": "int"
+      }
+    }
+  },
+  "selfRatingLabel": "Self-Rating: {rating}/5",
+  "@selfRatingLabel": {
+    "placeholders": {
+      "rating": {
+        "type": "int"
+      }
+    }
+  },
+  "languagesKnownLabel": "Languages Known: {langs}",
+  "@languagesKnownLabel": {
+    "placeholders": {
+      "langs": {
+        "type": "String"
+      }
+    }
+  },
+  "heightLabel": "Height: {height}",
+  "@heightLabel": {
+    "placeholders": {
+      "height": {
+        "type": "String"
+      }
+    }
+  },
+  "weightLabel": "Weight: {weight} kg",
+  "@weightLabel": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "files": "Files",
+  "profilePhotoLabel": "Profile Photo:",
+  "resumeLabel": "Resume:",
+  "close": "Close",
+  "incorrectPassword": "Incorrect password. Access denied.",
+  "formResponses": "Form Responses",
+  "responseCount": "{count} response{count, plural, =1{} other{s}}",
+  "@responseCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "incorrectPasswordShort": "Incorrect password",
+  "setAdminPassword": "Set admin password",
+  "newPassword": "New password",
+  "set": "Set",
+  "none": "None",
+  "agreed": "Agreed",
+  "notAgreed": "Not agreed",
+  "ratingStars": "Rating: ",
+  
+  "appearance": "Appearance",
+  "darkTheme": "Dark Theme",
+  "savesBattery": "Saves battery and reduces eye strain",
+  "brightAndClear": "Bright and clear display mode",
+  "notifications": "Notifications",
+  "pushNotifications": "Push Notifications",
+  "receiveAlerts": "Receive instant alerts on your device",
+  "emailDigests": "Email Digests",
+  "receiveDigests": "Receive a weekly summary of form activity",
+  "about": "About",
+  "formStackerApp": "FormStacker App",
+  "appVersion": "Version 1.0.0 (Build 4)",
+  "developerTools": "Developer Tools",
+  "showAdvanced": "Show advanced settings and debug options",
+  "devModeEnabled": "Developer mode is already enabled.",
+  
+  "noNotificationsYet": "No notifications yet.",
+  
+  "reviewMetrics": "Review your response and submission metrics in one place.",
+  "keyMetrics": "Key metrics",
+  
+  "darkMode": "Dark Mode",
+  "lightMode": "Light Mode",
+  "selectLanguage": "Select Language",
+  "userInformationForm": "User Information Form",
+  "pleaseProvideInfo": "Please provide your information below",
+  "personalInformation": "Personal Information",
+  "emailAddress": "Email Address",
+  "dateAgeInfo": "Date & Age Information",
+  "calculatedAgeLabel": "Calculated Age: {age} years",
+  "@calculatedAgeLabel": {
+    "placeholders": {
+      "age": {
+        "type": "String"
+      }
+    }
+  },
+  "genderMale": "Male",
+  "genderFemale": "Female",
+  "genderOther": "Other",
+  "genderPreferNotToSay": "Prefer not to say",
+  "location": "Location",
+  "selectStateUtHint": "Select your state or union territory",
+  "city": "City",
+  "chooseStateFirst": "Choose a state first to search cities",
+  "selectStateSuggestions": "Please select a state to see city suggestions.",
+  "langHindi": "Hindi",
+  "langEnglish": "English",
+  "langBengali": "Bengali",
+  "langFrench": "French",
+  "langJapanese": "Japanese",
+  "enterWholeFeet": "Enter whole feet",
+  "feetLimit": "Feet must be between 1 and 8",
+  "enterWholeInches": "Enter whole inches",
+  "inchesLimit": "Inches must be between 0 and 11",
+  "enterValidWeight": "Enter a valid weight",
+  "weightMinLimit": "Weight must be at least 20 kg",
+  "weightMaxLimit": "Weight must be at most 300 kg",
+  "professionalExperience": "Professional Experience",
+  "yearsOfExperienceHint": "Years of experience",
+  "yearsLabel": "{years} years",
+  "@yearsLabel": {
+    "placeholders": {
+      "years": {
+        "type": "String"
+      }
+    }
+  },
+  "rating": "Rating",
+  "agreements": "Agreements",
+  "selectAtLeastOneLanguage": "Please select at least one language",
+  "demographics": "Demographics",
+  "delete": "Delete",
+  "deleteResponse": "Delete Response",
+  "confirmDeleteMessage": "Are you sure you want to delete the response from {name}? This action cannot be undone.",
+  "@confirmDeleteMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "responseDeleted": "Response deleted"
+}

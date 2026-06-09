@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "567220563084",
+    "project_id": "formstacker-110fb",
+    "storage_bucket": "formstacker-110fb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:567220563084:android:db49e449dcca9add399fa9",
+        "android_client_info": {
+          "package_name": "com.tsuki.my_form_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKdTh5N1qBU9PZNbygz_nAHz_2yoKnUpE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

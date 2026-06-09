@@ -1,0 +1,11 @@
+Changes requested on Forms app
+
+
++ Fix Administration Page.
++ Finalize app name.
++ Add multilingual support.
+- Add Google Sign-In.
+- Add offline-first form submission behavior with Firebase sync.
++ Improve home page UI.
++ Expand the form to 15 total questions.
+- Create and organize a GitHub repository for the project.
