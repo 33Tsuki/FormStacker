@@ -19,6 +19,10 @@ class FormResponse {
   final bool synced;
   final String? firestoreId;
   final DateTime? createdAt;
+  final String? voiceRecordingPath;
+  final String? transcriptionOriginal;
+  final String? transcriptionEnglish;
+  final String? detectedLanguage;
 
   FormResponse({
     this.id,
@@ -39,6 +43,10 @@ class FormResponse {
     this.synced = false,
     this.firestoreId,
     this.createdAt,
+    this.voiceRecordingPath,
+    this.transcriptionOriginal,
+    this.transcriptionEnglish,
+    this.detectedLanguage,
   });
 
   // Convert FormResponse to Map for database insertion
@@ -62,6 +70,10 @@ class FormResponse {
       'synced': synced ? 1 : 0,
       'firestoreId': firestoreId,
       'createdAt': createdAt?.toIso8601String(),
+      'voiceRecordingPath': voiceRecordingPath,
+      'transcriptionOriginal': transcriptionOriginal,
+      'transcriptionEnglish': transcriptionEnglish,
+      'detectedLanguage': detectedLanguage,
     };
   }
 
@@ -94,6 +106,10 @@ class FormResponse {
       createdAt: map['createdAt'] != null
           ? DateTime.parse(map['createdAt'] as String)
           : null,
+      voiceRecordingPath: map['voiceRecordingPath'] as String?,
+      transcriptionOriginal: map['transcriptionOriginal'] as String?,
+      transcriptionEnglish: map['transcriptionEnglish'] as String?,
+      detectedLanguage: map['detectedLanguage'] as String?,
     );
   }
 
@@ -117,6 +133,10 @@ class FormResponse {
     bool? synced,
     String? firestoreId,
     DateTime? createdAt,
+    String? voiceRecordingPath,
+    String? transcriptionOriginal,
+    String? transcriptionEnglish,
+    String? detectedLanguage,
   }) {
     return FormResponse(
       id: id ?? this.id,
@@ -137,11 +157,15 @@ class FormResponse {
       synced: synced ?? this.synced,
       firestoreId: firestoreId ?? this.firestoreId,
       createdAt: createdAt ?? this.createdAt,
+      voiceRecordingPath: voiceRecordingPath ?? this.voiceRecordingPath,
+      transcriptionOriginal: transcriptionOriginal ?? this.transcriptionOriginal,
+      transcriptionEnglish: transcriptionEnglish ?? this.transcriptionEnglish,
+      detectedLanguage: detectedLanguage ?? this.detectedLanguage,
     );
   }
 
   @override
   String toString() {
-    return 'FormResponse(id: $id, name: $name, dob: $dob, age: $age, gender: $gender, rating: $rating, agreed: $agreed, photoPath: $photoPath, resumePath: $resumePath, languages: $languages, heightFeet: $heightFeet, heightInches: $heightInches, weight: $weight, createdAt: $createdAt)';
+    return 'FormResponse(id: $id, name: $name, dob: $dob, age: $age, gender: $gender, rating: $rating, agreed: $agreed, photoPath: $photoPath, resumePath: $resumePath, languages: $languages, heightFeet: $heightFeet, heightInches: $heightInches, weight: $weight, createdAt: $createdAt, voiceRecordingPath: $voiceRecordingPath, transcriptionOriginal: $transcriptionOriginal, transcriptionEnglish: $transcriptionEnglish, detectedLanguage: $detectedLanguage)';
   }
 }

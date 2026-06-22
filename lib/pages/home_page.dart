@@ -455,7 +455,7 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 16),
           InkWell(
             onTap: () async {
-              final url = Uri.parse('https://github.com/33tsuki');
+              final url = Uri.parse('https://github.com/33tsuki/FormStacker');
               if (await canLaunchUrl(url)) {
                 await launchUrl(url, mode: LaunchMode.externalApplication);
               }

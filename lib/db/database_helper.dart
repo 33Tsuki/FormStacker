@@ -10,7 +10,7 @@ class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._internal();
 
   static const _databaseName = 'form_responses.db';
-  static const _databaseVersion = 5;
+  static const _databaseVersion = 6;
   static const tableResponses = 'responses';
 
   Database? _database;
@@ -63,7 +63,11 @@ class DatabaseHelper {
         weight REAL DEFAULT 0.0,
         synced INTEGER DEFAULT 0,
         firestoreId TEXT,
-        createdAt TEXT
+        createdAt TEXT,
+        voiceRecordingPath TEXT,
+        transcriptionOriginal TEXT,
+        transcriptionEnglish TEXT,
+        detectedLanguage TEXT
       )
     ''');
   }
@@ -116,6 +120,20 @@ class DatabaseHelper {
       );
       await db.execute(
         'ALTER TABLE $tableResponses ADD COLUMN createdAt TEXT',
+      );
+    }
+    if (oldVersion < 6) {
+      await db.execute(
+        'ALTER TABLE $tableResponses ADD COLUMN voiceRecordingPath TEXT',
+      );
+      await db.execute(
+        'ALTER TABLE $tableResponses ADD COLUMN transcriptionOriginal TEXT',
+      );
+      await db.execute(
+        'ALTER TABLE $tableResponses ADD COLUMN transcriptionEnglish TEXT',
+      );
+      await db.execute(
+        'ALTER TABLE $tableResponses ADD COLUMN detectedLanguage TEXT',
       );
     }
   }

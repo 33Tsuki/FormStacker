@@ -14,6 +14,7 @@ import '../services/connectivity_service.dart';
 import '../store/response_store.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/sync_status_bar.dart';
+import '../widgets/voice_recorder_field.dart';
 
 class UserFormPage extends StatefulWidget {
   const UserFormPage({super.key});
@@ -26,6 +27,11 @@ class _UserFormPageState extends State<UserFormPage> {
   final _formKey = GlobalKey<FormBuilderState>();
   final _primaryColor = const Color(0xFF673AB7);
   final _accentColor = const Color(0xFF7C4DFF);
+
+  String? _voiceRecordingPath;
+  String? _transcriptionOriginal;
+  String? _transcriptionEnglish;
+  String? _detectedLanguage;
 
   final List<String> _states = [
     'Andhra Pradesh',
@@ -145,6 +151,10 @@ class _UserFormPageState extends State<UserFormPage> {
         weight: double.tryParse(values['weight']?.toString() ?? '') ?? 0.0,
         agreed: (values['agreed'] as bool?) ?? false,
         createdAt: DateTime.now(),
+        voiceRecordingPath: _voiceRecordingPath,
+        transcriptionOriginal: _transcriptionOriginal,
+        transcriptionEnglish: _transcriptionEnglish,
+        detectedLanguage: _detectedLanguage,
       );
 
       // Show submission overlay
@@ -489,34 +499,31 @@ class _UserFormPageState extends State<UserFormPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const SizedBox(height: 4),
-                                Row(
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: [
-                                    Expanded(
-                                      child: ElevatedButton.icon(
-                                        onPressed: () => _handlePhotoPick(field, ImageSource.gallery),
-                                        icon: const Icon(Icons.photo_library),
-                                        label: Text(l10n.gallery),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: _primaryColor,
-                                          foregroundColor: Colors.white,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
+                                    ElevatedButton.icon(
+                                      onPressed: () => _handlePhotoPick(field, ImageSource.gallery),
+                                      icon: const Icon(Icons.photo_library),
+                                      label: Text(l10n.gallery),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: _primaryColor,
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8),
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: ElevatedButton.icon(
-                                        onPressed: () => _handlePhotoPick(field, ImageSource.camera),
-                                        icon: const Icon(Icons.camera_alt),
-                                        label: Text(l10n.takePhoto),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: _primaryColor,
-                                          foregroundColor: Colors.white,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
+                                    const SizedBox(height: 8),
+                                    ElevatedButton.icon(
+                                      onPressed: () => _handlePhotoPick(field, ImageSource.camera),
+                                      icon: const Icon(Icons.camera_alt),
+                                      label: Text(l10n.takePhoto),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: _primaryColor,
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8),
                                         ),
                                       ),
                                     ),
@@ -735,6 +742,22 @@ class _UserFormPageState extends State<UserFormPage> {
                         ]),
                       ),
                     ]),
+                    const SizedBox(height: 32),
+                    VoiceRecorderField(
+                      onChanged: ({
+                        required voiceRecordingPath,
+                        required transcriptionOriginal,
+                        required transcriptionEnglish,
+                        required detectedLanguage,
+                      }) {
+                        setState(() {
+                          _voiceRecordingPath = voiceRecordingPath;
+                          _transcriptionOriginal = transcriptionOriginal;
+                          _transcriptionEnglish = transcriptionEnglish;
+                          _detectedLanguage = detectedLanguage;
+                        });
+                      },
+                    ),
                     const SizedBox(height: 32),
                     // Experience Section
                     _buildSectionTitle(l10n.professionalExperience),

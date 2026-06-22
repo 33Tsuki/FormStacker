@@ -1,5 +1,9 @@
+import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:audio_session/audio_session.dart';
 import '../l10n/app_localizations.dart';
 import '../services/connectivity_service.dart';
 import '../services/sync_service.dart';
@@ -380,7 +384,14 @@ class _AdminPageState extends State<AdminPage> {
                             itemBuilder: (context, index) {
                               final r = responses[index];
                               final dob = r.dob;
-                              return _buildResponseCard(index, r, dob);
+                              return AdminResponseCard(
+                                index: index,
+                                response: r,
+                                dob: dob,
+                                primaryColor: _primaryColor,
+                                accentColor: _accentColor,
+                                onDelete: () => _confirmDelete(index, r.name),
+                              );
                             },
                           ),
                         ),
@@ -392,9 +403,190 @@ class _AdminPageState extends State<AdminPage> {
       ),
     );
   }
+}
 
-  Widget _buildResponseCard(int index, dynamic r, DateTime dob) {
+class AdminResponseCard extends StatefulWidget {
+  final int index;
+  final dynamic response;
+  final DateTime dob;
+  final Color primaryColor;
+  final Color accentColor;
+  final VoidCallback onDelete;
+
+  const AdminResponseCard({
+    super.key,
+    required this.index,
+    required this.response,
+    required this.dob,
+    required this.primaryColor,
+    required this.accentColor,
+    required this.onDelete,
+  });
+
+  @override
+  State<AdminResponseCard> createState() => _AdminResponseCardState();
+}
+
+class _AdminResponseCardState extends State<AdminResponseCard> {
+  AudioPlayer? _audioPlayer;
+  bool _isPlaying = false;
+  Duration _duration = Duration.zero;
+  Duration _position = Duration.zero;
+  Timer? _waveformTimer;
+  List<double> _barHeights = [10.0, 10.0, 10.0, 10.0, 10.0];
+  bool _audioFileExists = false;
+  StreamSubscription? _playerStateSub;
+
+  StreamSubscription? _positionSub;
+
+  @override
+  void initState() {
+    super.initState();
+    final path = widget.response.voiceRecordingPath;
+    if (path != null && path.isNotEmpty) {
+      final file = File(path);
+      if (file.existsSync()) {
+        _audioFileExists = true;
+        _initPlayer(path);
+      }
+    }
+  }
+
+  Future<void> _initPlayer(String path) async {
+    _audioPlayer = AudioPlayer();
+
+    // Configure audio session for media playback through speaker
+    try {
+      final session = await AudioSession.instance;
+      await session.configure(const AudioSessionConfiguration(
+        avAudioSessionCategory: AVAudioSessionCategory.playback,
+        avAudioSessionCategoryOptions: AVAudioSessionCategoryOptions.defaultToSpeaker,
+        avAudioSessionMode: AVAudioSessionMode.defaultMode,
+        androidAudioAttributes: AndroidAudioAttributes(
+          contentType: AndroidAudioContentType.music,
+          usage: AndroidAudioUsage.media,
+        ),
+        androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+      ));
+      await session.setActive(true);
+    } catch (e) {
+      debugPrint('Error configuring admin audio session: $e');
+    }
+
+    _playerStateSub = _audioPlayer!.playerStateStream.listen((state) {
+      if (!mounted) return;
+      final playing = state.playing;
+      setState(() {
+        _isPlaying = playing;
+      });
+      if (playing) {
+        _startWaveformAnimation();
+      } else {
+        _waveformTimer?.cancel();
+      }
+      if (state.processingState == ProcessingState.completed) {
+        setState(() {
+          _isPlaying = false;
+          _position = _duration;
+        });
+        _audioPlayer!.pause();
+        _audioPlayer!.seek(Duration.zero);
+      }
+    });
+
+    // Don't use durationStream - it can emit unreliable values.
+
+    _positionSub = _audioPlayer!.positionStream.listen((p) {
+      if (!mounted) return;
+      setState(() {
+        _position = p;
+      });
+    });
+
+    try {
+      final fileDuration = await _audioPlayer!.setFilePath(path);
+      if (mounted && fileDuration != null) {
+        setState(() {
+          _duration = fileDuration;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading audio file: $e');
+    }
+  }
+
+  void _startWaveformAnimation() {
+    _waveformTimer?.cancel();
+    _waveformTimer = Timer.periodic(const Duration(milliseconds: 120), (timer) {
+      if (mounted && _isPlaying) {
+        setState(() {
+          _barHeights = List.generate(5, (index) {
+            final factor = (DateTime.now().millisecond % (index + 2)) / (index + 2);
+            return 8.0 + (index % 2 == 0 ? 20.0 : 12.0) * (0.3 + 0.7 * factor);
+          });
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _waveformTimer?.cancel();
+    _playerStateSub?.cancel();
+
+    _positionSub?.cancel();
+    _audioPlayer?.dispose();
+    super.dispose();
+  }
+
+  Future<void> _togglePlayback() async {
+    if (!_audioFileExists || _audioPlayer == null) return;
+
+    try {
+      if (_isPlaying) {
+        await _audioPlayer!.pause();
+      } else {
+        if (_audioPlayer!.processingState == ProcessingState.completed) {
+          await _audioPlayer!.seek(Duration.zero);
+        }
+        await _audioPlayer!.play();
+      }
+    } catch (e) {
+      debugPrint('Error playing admin audio: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error playing audio: $e'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    }
+  }
+
+  String _formatDuration(int totalSeconds) {
+    final minutes = totalSeconds ~/ 60;
+    final seconds = totalSeconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  String _formatTime(Duration d) {
+    return _formatDuration(d.inSeconds);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final r = widget.response;
+    final dob = widget.dob;
+    final primaryColor = widget.primaryColor;
+    final index = widget.index;
+
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final chipBg = isDark ? const Color(0xFF3D2D5C) : const Color(0xFFEDE7F6);
+    final textStyleColor = isDark ? Colors.white : Colors.black87;
+
     return Card(
       elevation: 1,
       margin: const EdgeInsets.only(bottom: 16),
@@ -402,7 +594,7 @@ class _AdminPageState extends State<AdminPage> {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
-          border: Border(left: BorderSide(color: _primaryColor, width: 4)),
+          border: Border(left: BorderSide(color: primaryColor, width: 4)),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -441,7 +633,7 @@ class _AdminPageState extends State<AdminPage> {
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          color: _primaryColor,
+                          color: primaryColor,
                           shape: BoxShape.circle,
                         ),
                         padding: const EdgeInsets.all(8),
@@ -464,7 +656,7 @@ class _AdminPageState extends State<AdminPage> {
                       IconButton(
                         icon: Icon(Icons.delete_outline, color: Colors.red[400]),
                         tooltip: l10n.delete,
-                        onPressed: () => _confirmDelete(index, r.name),
+                        onPressed: widget.onDelete,
                       ),
                     ],
                   ),
@@ -502,18 +694,18 @@ class _AdminPageState extends State<AdminPage> {
                 runSpacing: 8,
                 children: r.languages.isNotEmpty
                     ? r.languages
-                          .map<Widget>(
-                            (language) => Chip(
-                              label: Text(language),
-                              backgroundColor: Color.fromRGBO(
-                                (_primaryColor.r * 255).round(),
-                                (_primaryColor.g * 255).round(),
-                                (_primaryColor.b * 255).round(),
-                                0.1,
-                              ),
+                        .map<Widget>(
+                          (language) => Chip(
+                            label: Text(language),
+                            backgroundColor: Color.fromRGBO(
+                              (primaryColor.r * 255).round(),
+                              (primaryColor.g * 255).round(),
+                              (primaryColor.b * 255).round(),
+                              0.1,
                             ),
-                          )
-                          .toList()
+                          ),
+                        )
+                        .toList()
                     : [
                         Chip(
                           label: Text(l10n.none),
@@ -549,7 +741,7 @@ class _AdminPageState extends State<AdminPage> {
                       return Icon(
                         i < r.rating ? Icons.star : Icons.star_border,
                         size: 16,
-                        color: _primaryColor,
+                        color: primaryColor,
                       );
                     }),
                   ),
@@ -566,6 +758,156 @@ class _AdminPageState extends State<AdminPage> {
                   ),
                 ],
               ),
+              if (r.transcriptionOriginal != null && r.transcriptionOriginal!.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                const Divider(height: 1),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Icon(Icons.mic, color: primaryColor, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Voice Note',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: primaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                if (r.voiceRecordingPath != null && r.voiceRecordingPath!.isNotEmpty) ...[
+                  if (_audioFileExists) ...[
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: _togglePlayback,
+                          icon: Icon(
+                            _isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled,
+                            size: 28,
+                            color: primaryColor,
+                          ),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                        const SizedBox(width: 8),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: List.generate(5, (index) {
+                            return AnimatedContainer(
+                              duration: const Duration(milliseconds: 120),
+                              width: 3,
+                              height: _isPlaying ? _barHeights[index] : 8.0,
+                              margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                              decoration: BoxDecoration(
+                                color: primaryColor,
+                                borderRadius: BorderRadius.circular(1.5),
+                              ),
+                            );
+                          }),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '${_formatTime(_position)} / ${_formatTime(_duration)}',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: isDark ? Colors.grey[400] : Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ] else ...[
+                    Row(
+                      children: [
+                        Icon(Icons.info_outline, size: 16, color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Audio not available on this device',
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            color: isDark ? Colors.grey[400] : Colors.grey[600],
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                  const SizedBox(height: 8),
+                ],
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF1E1E1E) : Colors.grey[50],
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: isDark ? Colors.grey[800]! : Colors.grey[200]!,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Original Transcription',
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: primaryColor,
+                            ),
+                          ),
+                          if (r.detectedLanguage != null && r.detectedLanguage!.isNotEmpty)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: chipBg,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                r.detectedLanguage!,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 10,
+                                  color: primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        r.transcriptionOriginal!,
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          color: textStyleColor,
+                        ),
+                      ),
+                      if (r.transcriptionEnglish != null && r.transcriptionEnglish!.isNotEmpty) ...[
+                        const Divider(height: 12),
+                        Text(
+                          'English Translation',
+                          style: GoogleFonts.poppins(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: primaryColor,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          r.transcriptionEnglish!,
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            color: textStyleColor,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
             ],
           ),
         ),

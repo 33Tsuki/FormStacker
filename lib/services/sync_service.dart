@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import '../db/database_helper.dart';
 import '../models/form_response.dart';
@@ -11,7 +12,10 @@ class SyncService {
   static final SyncService _instance = SyncService._internal();
   factory SyncService() => _instance;
 
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instanceFor(
+    app: Firebase.app(),
+    databaseId: 'formstacker',
+  );
   final Connectivity _connectivity = Connectivity();
 
   /// Notifier for UI to observe sync state changes.
@@ -67,6 +71,9 @@ class SyncService {
         'heightInches': response.heightInches,
         'weight': response.weight,
         'submittedAt': response.createdAt?.toIso8601String() ?? DateTime.now().toIso8601String(),
+        'transcriptionOriginal': response.transcriptionOriginal,
+        'transcriptionEnglish': response.transcriptionEnglish,
+        'detectedLanguage': response.detectedLanguage,
       };
 
       final docRef = await _firestore.collection('responses').add(data);
@@ -75,8 +82,8 @@ class SyncService {
       _setSyncState(SyncState.success);
       return true;
     } catch (error, stackTrace) {
-      debugPrint('SyncService.syncResponse failed: $error');
-      debugPrint('$stackTrace');
+      debugPrint('SyncService.syncResponse failed: ${error.runtimeType}: $error');
+      debugPrint('Stack trace: $stackTrace');
       _setSyncState(SyncState.failed);
       return false;
     }
